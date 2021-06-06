@@ -7,6 +7,9 @@
 #SBATCH --mail-type=
 #SBATCH --mail-user=
 
+
 module load julia
 
-srun julia /home/tianjing/paper_simu/simulation.jl $1
+
+srun julia /home/tianjing/paper_simu/jwas.jl $1 $2 $3
+

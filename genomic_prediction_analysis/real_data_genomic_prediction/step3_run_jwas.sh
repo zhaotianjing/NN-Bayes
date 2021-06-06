@@ -11,11 +11,12 @@ methodAll=("hmc_rrblup_2" "hmc_rrblup_3" "hmc_rrblup_5" "hmc_rrblup_10" "rrblup"
 	       "hmc_bayesl_2" "hmc_bayesl_3" "hmc_bayesl_5" "hmc_bayesl_10" "bayesl")  #e.g., hmc_bayescpi_2 is NN-BayesCPi-2
 
 cd "$species"
+
 for method in "${methodAll[@]}"
 do
 	cd run_"$method"
 
-	for rep in $( eval echo {1..$nRep} )
+	for rep in $( eval echo {1..$nRep} )  #rep1,...,rep20
 	do
 	    sbatch /group/qtlchenggrp/tianjing/paper_real/jwas.sbatch $species $method $rep
 	done

@@ -12,12 +12,12 @@ methodAll=("hmc_rrblup_2" "hmc_rrblup_3" "hmc_rrblup_5" "hmc_rrblup_10" "rrblup"
 
 for method in "${methodAll[@]}"
 do
-	for repy in $( eval echo {1..$nRepy} )
+	for repy in $( eval echo {1..$nRepy} )  #y1,..,y20
 	do
 	    cd y"$repy"
 		cd run_"$method"
 
-		for rep in $( eval echo {1..$nRep} ) 
+		for rep in $( eval echo {1..$nRep} )  #rep1,...,rep50
 		do
 		    sbatch /home/tianjing/paper_simu/jwas.sbatch $repy $rep $method
 		done

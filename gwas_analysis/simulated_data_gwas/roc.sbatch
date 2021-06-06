@@ -7,6 +7,9 @@
 #SBATCH --mail-type=
 #SBATCH --mail-user=
 
-module load julia
 
-srun julia /home/tianjing/paper_simu/simulation.jl $1
+module load R
+
+
+srun Rscript /group/qtlchenggrp/tianjing/GWAS/roc.R $1 $2
+

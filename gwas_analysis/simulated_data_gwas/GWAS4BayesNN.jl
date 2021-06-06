@@ -1,3 +1,5 @@
+#this file contains the function for WPPA in NN-Bayes
+#the function is modified from the build-in JWAS function: GWAS()
 
 function GWAS4BayesNN(mme,map_file,marker_effects_file1,marker_effects_file2,weights_file,ebv_file;
               #mapfile

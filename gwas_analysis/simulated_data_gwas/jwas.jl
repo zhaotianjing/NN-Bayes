@@ -1,3 +1,5 @@
+#this file is the script to run JWAS.
+
 using DataFrames,CSV,Random,Distributions,JWAS,DelimitedFiles
 Random.seed!(123)
 
@@ -13,14 +15,16 @@ cd(mainpath*"y$repy/$method/")
 
 traitname="y"
 phenoname="pig.y.epistasis.rep$repy.txt"
-genofile = mainpath*"pig.x.n928.p5024.txt"
+genofile = mainpath*"pig.x.n928.p5024.txt"   #chromosome1
 phenofile  = mainpath*"y$repy/"*phenoname
 
+#obtain number of hidden nodes
 if occursin("hmc",method) #NN-Bayes
 	num_latent_traits = parse(Int,split(method,"_")[3]) #e.g., 2
 	method=split(method,"_")[2]   #e.g., bayescpi
 end
 
+#set JWAS parameters for each method
 if method=="rrblup"
 	jwas_method="RR-BLUP"
 	jwas_estimatePi=false
@@ -53,8 +57,10 @@ phenotypes[!,:ID]=string.(phenotypes[!,:ID]);
 geno = get_genotypes(genofile,method=jwas_method,estimatePi=jwas_estimatePi);
 model_equations = "$traitname = intercept + geno";
 
+
+############ RUN JWAS ##########
 if occursin("hmc",method_cpy) #NN-Bayes
-	model = build_model(model_equations,num_latent_traits=num_latent_traits,nonlinear_function="Neural Network");
+	model = build_model(model_equations,num_latent_traits=num_latent_traits,nonlinear_function="Neural Network",activation_function="tanh");
 	out   = runMCMC(model,phenotypes,mega_trait=true,chain_length=chainLength,burnin=burnin,output_samples_frequency=output_samples_frequency,double_precision=double_precision);
 elseif !occursin("hmc",method_cpy) #linear model
 	model = build_model(model_equations);

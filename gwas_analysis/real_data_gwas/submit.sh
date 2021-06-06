@@ -7,6 +7,6 @@
 #SBATCH --mail-type=
 #SBATCH --mail-user=
 
+#this file is to run JWAS
 module load julia
-
-srun julia /home/tianjing/paper_simu/simulation.jl $1
+srun julia GWAS.jl

@@ -1,29 +1,33 @@
+#this file is the Julia script to simulate data
+
 using Random, Distributions, CSV, DataFrames,StatsBase,Statistics,LinearAlgebra,DelimitedFiles
 
-repy=parse(Int, ARGS[1]) 
-Random.seed!(repy);  #different seed for different simulated phenotype
+### read data
+repy=parse(Int, ARGS[1])   #e.g, y1
+Random.seed!(repy);        #set different seed for y1,...,y20
 
-geno_path="/home/tianjing/paper_simu/pig.x.n928.p5024.txt"  #genotype of chromosome1 of pig
-X=CSV.File(geno_path) |> DataFrame
+geno_path="/home/tianjing/paper_simu/pig.x.n928.p5024.txt"  #path to genotype of chromosome1 of pig
+X=CSV.File(geno_path) |> DataFrame                          #read genotype
 
-SNP_ID= names(X)[2:end]
-ID=X[:,1];
+SNP_ID= names(X)[2:end]   #get SNP ID (i.e., first row)
+ID=X[:,1];                #get individual ID (i.e., first column)
 
-X=Matrix(X[:,2:end]);  #1st column is ID
-n,p=size(X)
+X=Matrix(X[:,2:end]);     #get genotype matrix
+n,p=size(X)               #n is #row, p is #column
 
 
-#genetic parameters
-H2    = 0.5      # broad-sense heritability
-var_y = 1        # phenotypic variance
-var_e = (1-H2)*var_y
-var_g = H2*var_y
+### set genetic parameters
+H2    = 0.5           # broad-sense heritability
+var_y = 1             # phenotypic variance
+var_e = (1-H2)*var_y  # environmental variance
+var_g = H2*var_y      # genotipic variance
 
-mypi         = 0.95  # 1 - marker inclusion probability
-nQTL         = floor(Int, p*(1-mypi))
-QTL_position = sample(collect(1:p),nQTL);
-QTL_ID       = SNP_ID[QTL_position]
+mypi         = 0.95                      # 5% markers are QTLs
+nQTL         = floor(Int, p*(1-mypi))    #number of QTL
+QTL_position = sample(collect(1:p),nQTL);#position of QTL
+QTL_ID       = SNP_ID[QTL_position]      #corresponding SNP ID for QTL
 
+### save data
 open("QTL_position.txt", "w") do io
            writedlm(io, QTL_position, ',')
        end;
@@ -32,7 +36,11 @@ open("QTL_ID.txt", "w") do io
        end;
 
 
-# calculate Epistatic coefficient Interaction Ei
+#### calculate Epistatic coefficient (Ei)
+# 
+# van Bergen, Giel HH, et al. "Bayesian neural networks with variable selection 
+# for prediction of genotypic values." Genetics Selection Evolution 52 (2020): 1-14.
+#
 function generate_epitasis_coef_Ec(qtl1,qtl2)
     n        = length(qtl1)
     epi_coef = zeros(n)  #length n
@@ -68,7 +76,7 @@ function generate_epitasis_coef_Ec(qtl1,qtl2)
     return(epi_coef)
 end
 
-#calculate epistasis_coefficient*epistatic effect
+### calculate epistasis effect
 function create_epi(n, nQTL, ϵ, Mi)
     epistasis=zeros(n)
     for i in 1:nQTL
@@ -84,6 +92,11 @@ function create_epi(n, nQTL, ϵ, Mi)
 end
 
 
+### simulation
+# 
+# van Bergen, Giel HH, et al. "Bayesian neural networks with variable selection 
+# for prediction of genotypic values." Genetics Selection Evolution 52 (2020): 1-14.
+#
 a=randn(nQTL)                     #additive effect
 δ=rand(Normal(1.2,0.3),nQTL)      #dominance factor
 d=abs.(a).*δ                      #dominance effect
@@ -97,25 +110,24 @@ for i in 1:nQTL
     end
 end
 
-Ma = X[:,QTL_position]
+Ma = X[:,QTL_position] #genotype matrix for QTL
 
 Md = copy(Ma)
-Md[Md.!=1].=0.0;  # indicator for the heterozygous genotype
+Md[Md.!=1].=0.0;       #indicator matrix for the heterozygous genotype
 
 Mi = copy(Ma)
+epistasis=create_epi(n, nQTL, ϵ, Mi)  #calculate epistasis
 
-epistasis=create_epi(n, nQTL, ϵ, Mi)
 
-#check h2
-println("Vi:Vd:Va is",round(var(epistasis),digits=2),":",round(var(Md*d),digits=2),":",round(var(Ma*a),digits=2))
-
-#scale Ma*a+Md*d+epistasis
+### scale Ma*a+Md*d+epistasis
 g=Ma*a+Md*d+epistasis
 println("Va+Vd+Vi before scaling:",round(var(g),digits=2))
 g_new = g/std(g)*sqrt(var_g)
 println("Va+Vd+Vi after scaling:",round(var(g_new),digits=2))
 
+### simulate phenptype
 y= g_new +randn(n)*sqrt(var_e)
 
+### save data
 df = DataFrame(ID = ID, y = y);
 CSV.write("pig.y.epistasis.rep$repy.txt", df)

@@ -1,4 +1,6 @@
 #!/usr/bin/env Rscript
+
+#this file is R script for calculate AUC
 args=commandArgs(trailingOnly=T)
 repy = args[1] 
 method=args[2]
@@ -8,6 +10,7 @@ library("gridExtra")
 rootpath=paste0("/group/qtlchenggrp/tianjing/GWAS/y",repy,"/",method)
 setwd(rootpath)
 
+#read data
 realQTL=read.table(paste0("/group/qtlchenggrp/tianjing/GWAS/y",repy,"/QTL_ID.txt"))$V1
 mapfile=read.csv("/group/qtlchenggrp/tianjing/GWAS/pig_map_chr1.csv")
 realQTL_map = mapfile[mapfile$Column1 %in% realQTL,]
@@ -20,6 +23,7 @@ if (grepl("hmc", method, fixed=TRUE)){  #NN-Bayes
 
 wppa = wppa[order(wppa$window),]
 
+#mark windows with true QTL
 wppa$realQTL="Non_QTL"
 for (i in 1:nrow(wppa)){  #each window
   window_start=wppa$start_SNP[i]
@@ -34,14 +38,16 @@ for (i in 1:nrow(wppa)){  #each window
   }
 }
 
-################################# ROC
+# calculate ROC
 library(pROC)
 
 roc_y=roc(wppa$realQTL, wppa$WPPA)
 auc_y=auc(roc_y)
 
+#visualization
 jpeg(paste0("roc.y",repy,".",method,".jpg"))
 plot(roc_y, print.auc = TRUE)
 dev.off()
 
+#save result
 write.csv(auc_y,paste0("auc.y",repy,".",method,".csv"))

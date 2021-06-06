@@ -1,6 +1,6 @@
+# this file is to run JWAS
 using DataFrames,CSV,Random,Distributions,JWAS,DelimitedFiles
 Random.seed!(123)
-
 
 species           = ARGS[1]
 method            = ARGS[2]
@@ -36,16 +36,17 @@ genofile = "/home/tianjing/BNN_data/$species/$species"*"_geno_clean.txt"
 id_path = mainpath*"train_test_ID/"
 trainIDs = vec(Int64.(readdlm(id_path*"rep$rep.trainID.txt")))
 
-
+#obtain number of hidden nodes
 if occursin("hmc",method)
 	num_latent_traits = parse(Int,split(method,"_")[3])  #e.g., 2
 	method=split(method,"_")[2]  # e.g., bayescpi
 end
 
+#set JWAS parameters for each method
 if method=="rrblup"
 	jwas_method="RR-BLUP"
-	jwas_estimatePi=false
-	double_precision=false
+	jwas_estimatePi=false   #Pi: marker includion probability
+	double_precision=false  #Float64 or Float32
 elseif method=="bayesa"
 	jwas_method="BayesA"
 	jwas_estimatePi=false
@@ -67,11 +68,11 @@ else
 end
 
 
-geno = get_genotypes(genofile,method=jwas_method,estimatePi=jwas_estimatePi);
-model_equations = "$traitname = intercept + geno";
+geno = get_genotypes(genofile,method=jwas_method,estimatePi=jwas_estimatePi); # add genotype
+model_equations = "$traitname = intercept + geno";                            # build model
 
 if occursin("hmc",method_cpy)   #NN-Bayes
-	model = build_model(model_equations,num_latent_traits=num_latent_traits,nonlinear_function="Neural Network");
+	model = build_model(model_equations,num_latent_traits=num_latent_traits,nonlinear_function="Neural Network",activation_function="tanh");
 	out   = runMCMC(model,phenotypes[trainIDs,:],mega_trait=true,chain_length=chainLength,double_precision=double_precision);
 elseif !occursin("hmc",method_cpy)  #linear models
 	model = build_model(model_equations);
