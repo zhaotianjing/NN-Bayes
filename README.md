@@ -1,6 +1,6 @@
 # NN-Bayes
 Scripts for our NN-Bayes paper:
-*Cheng, Hao, Tianjing Zhao, and Rohan L. Fernando. "Interpretable Artificial Neural Networks incorporating Bayesian Alphabet Models for Genome-wide Prediction and Association Studies." bioRxiv (2021).* [see here](https://www.biorxiv.org/content/10.1101/2021.04.07.438762v1?rss=1)
+*Tianjing Zhao, Rohan L. Fernando, and Hao Cheng. "Interpretable Artificial Neural Networks incorporating Bayesian Alphabet Models for Genome-wide Prediction and Association Studies." bioRxiv (2021).* [see here](https://www.biorxiv.org/content/10.1101/2021.04.07.438762v1?rss=1)
 
 
 To perform NN-Bayes in [JWAS](https://github.com/reworkhow/JWAS.jl/tree/master/src/1.JWAS/src), please see the example [here](https://github.com/reworkhow/JWAS.jl/wiki/Neural-Networks). More details can be found in the documentation of JWAS.
