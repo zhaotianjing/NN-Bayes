@@ -2,8 +2,7 @@
 Scripts for our NN-Bayes paper:
 *Tianjing Zhao, Rohan L. Fernando, and Hao Cheng. "Interpretable Artificial Neural Networks incorporating Bayesian Alphabet Models for Genome-wide Prediction and Association Studies." bioRxiv (2021).* [see here](https://www.biorxiv.org/content/10.1101/2021.04.07.438762v1?rss=1)
 
-
-To perform NN-Bayes in [JWAS](https://github.com/reworkhow/JWAS.jl), please see latest examples [here](https://github.com/reworkhow/JWAS.jl/wiki/Neural-Networks-(NN-LMM)). More details can be found in the documentation of JWAS. The scripts here may be invalid due to the updated NN-Bayes interface in JWAS.
+NN-Bayes has a new name: "mixed effects neural networks (NN-MM)". To perform NN-Bayes in [JWAS](https://github.com/reworkhow/JWAS.jl), please see [documentation](https://reworkhow.github.io/JWAS.jl/latest/) and latest examples. The scripts here may be invalid due to the updated NN-Bayes interface in JWAS. 
 
 
 Below is the description of each folder:
